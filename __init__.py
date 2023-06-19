@@ -1,7 +1,7 @@
 bl_info = {
     "name": "BGEN Flow",
     "author": "Munorr",
-    "version": (1, 1),
+    "version": (1, 1, 0),
     "blender": (3, 5, 0),
     "location": "View3D > N",
     "description": "Control parameters from B_GEN geometry node hair system",
@@ -2150,7 +2150,7 @@ class BGEN_preferences(bpy.types.AddonPreferences):
     updater_interval_days = bpy.props.IntProperty(
         name='Days',
         description="Number of days between checking for updates",
-        default=7,
+        default=1,
         min=0,
         max=31)
 
