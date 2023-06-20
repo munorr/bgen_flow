@@ -1370,7 +1370,10 @@ class BGEN_ui_panel(bpy.types.Panel):
             box_s = row_main.box()
             col_s = box_s.column()
             col_s.scale_y = 1
-            row_s = col_s.row()
+
+            row_ss = col_s.row()
+            row_s = row_ss.row()
+            row_s.alignment = "LEFT"
             row_s.label(text = "[" + obj.type + "]", icon = "OBJECT_DATAMODE")
             row_s.label(text = "",icon = "TRIA_RIGHT")
             row_s.label(text = obj.name, icon = "CURVES")
@@ -1384,7 +1387,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                 row_exec.alignment = "RIGHT"
                 row_exec.label(text = execTime + "ms", icon = "PREVIEW_RANGE")
 
-            row_pin = row_s.row()
+            row_pin = row_ss.row()
             row_pin.alignment = "RIGHT"
             row_pin.prop(my_tools, "pin_obj", text="", icon = "PINNED" if my_tools.pin_obj else "UNPINNED", icon_only = True, emboss=False)
             #---------------------------------------------------------------------------------------------
@@ -2197,7 +2200,7 @@ class BGEN_preferences(bpy.types.AddonPreferences):
     auto_check_update = bpy.props.BoolProperty(
         name="Auto-check for Update",
         description="If enabled, auto-check for updates using an interval",
-        default=True)
+        default=False)
 
     updater_interval_months = bpy.props.IntProperty(
         name='Months',
