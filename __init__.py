@@ -274,6 +274,16 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                     data_to.node_groups = [nt_name]
                     return True
             return False
+        
+        def load_material(nt_name, link=True):
+            if not os.path.isfile(nodelib_path):
+                return False
+
+            with bpy.data.libraries.load(nodelib_path, link=link) as (data_from, data_to):
+                if nt_name in data_from.materials:
+                    data_to.materials = [nt_name]
+                    return True
+            return False
 
         if "bgen_nodes" not in bpy.data.node_groups:
             load_node("bgen_nodes", link=False)
@@ -283,6 +293,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
         
         if "00_bgen_braids" not in bpy.data.node_groups:
             load_node("00_bgen_braids", link=False)
+
+        if "BV2_Hair_Shader" not in bpy.data.materials:
+            load_material("BV2_Hair_Shader", link=False)
 
         return context.window_manager.invoke_props_dialog(self)
     
@@ -680,11 +693,24 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
                     return True
             return False
 
+        def load_material(nt_name, link=True):
+            if not os.path.isfile(nodelib_path):
+                return False
+
+            with bpy.data.libraries.load(nodelib_path, link=link) as (data_from, data_to):
+                if nt_name in data_from.materials:
+                    data_to.materials = [nt_name]
+                    return True
+            return False
+        
         if "bgen_nodes" not in bpy.data.node_groups:
             load_node("bgen_nodes", link=False)
             
         if "00_bgen_hair" not in bpy.data.node_groups:
             load_node("00_bgen_hair", link=False)
+        
+        if "BV2_Hair_Shader" not in bpy.data.materials:
+            load_material("BV2_Hair_Shader", link=False)
         
         return context.window_manager.invoke_props_dialog(self)
     
@@ -2200,7 +2226,7 @@ class BGEN_preferences(bpy.types.AddonPreferences):
     auto_check_update = bpy.props.BoolProperty(
         name="Auto-check for Update",
         description="If enabled, auto-check for updates using an interval",
-        default=True)
+        default=False)
 
     updater_interval_months = bpy.props.IntProperty(
         name='Months',
