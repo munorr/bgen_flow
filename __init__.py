@@ -1,7 +1,7 @@
 bl_info = {
     "name": "BGEN Flow",
     "author": "Munorr",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (3, 5, 0),
     "location": "View3D > N",
     "description": "Control parameters from B_GEN geometry node hair system",
@@ -795,6 +795,9 @@ class BGEN_OT_execute_cloth_settings(bpy.types.Operator):
         clsnColl = bpy.context.scene.bgen_tools.col_collection
         #pinStiff = bpy.context.scene.bgen_tools.my_float5
         airVis = bpy.context.scene.bgen_tools.my_float6
+
+        frame_start = bpy.context.scene.bgen_tools.sim_start
+        frame_end = bpy.context.scene.bgen_tools.sim_end
         
         while collection_stack:
             current_collection = collection_stack.pop()
@@ -840,6 +843,9 @@ class BGEN_OT_execute_cloth_settings(bpy.types.Operator):
                         cloth_modifier.collision_settings.collision_quality = 5
                         cloth_modifier.collision_settings.distance_min = 0.001
                         cloth_modifier.collision_settings.impulse_clamp = 20
+
+                        cloth_modifier.point_cache.frame_start = frame_start
+                        cloth_modifier.point_cache.frame_end = frame_end
                     
                 for child_collection in current_collection.children:
                     collection_stack.append(child_collection)
@@ -1184,6 +1190,9 @@ class BGEN_PT_bgenProperties(bpy.types.PropertyGroup):
 
     pin_obj : bpy.props.BoolProperty(name="Pin Object", description="Pins active object", default=False, set=set_pin_obj, get=get_pin_obj)
     
+    sim_start : bpy.props.IntProperty(name= "", soft_min= 0, soft_max= 4000, default= (1),description="Bake to cache starts from frame ...")
+    sim_end : bpy.props.IntProperty(name= "", soft_min= 0, soft_max= 4000, default= (250),description="Bake to cache end in frame ...")
+
     my_float1 : bpy.props.FloatProperty(name= "", soft_min= 0, soft_max= 20, default= (0.5))
     my_float2 : bpy.props.FloatProperty(name= "", soft_min= 0, soft_max= 1, default= (1))
     my_float3 : bpy.props.FloatProperty(name= "", soft_min= 0, soft_max= 50, default= (15))
@@ -1232,6 +1241,7 @@ class BGEN_PT_bgenExpandProp(bpy.types.PropertyGroup):
     menu_exp5 : bpy.props.BoolProperty(default=False)
     menu_exp6 : bpy.props.BoolProperty(default=False)
     menu_exp7 : bpy.props.BoolProperty(default=False) #SIM
+    menu_exp8 : bpy.props.BoolProperty(default=False) #Bake to Cache Settings
     
     dd_exp1 : bpy.props.BoolProperty(default=False)
     dd_exp2 : bpy.props.BoolProperty(default=False)
@@ -1973,15 +1983,15 @@ class BGEN_ui_panel(bpy.types.Panel):
                 #============================================================================================
                                                         #[SIM SETTINGS]
                 #============================================================================================
-                col1 = col.column()
+                #col1 = col.column()
                 
                 if obj.type == "CURVES":
-                    col_ = col1.column()
+                    col_ = col.column()
                     col_.scale_y = 1.8
                     col_.operator("object.bgen_create_sim_guides", text="Create Sim Guides", depress=True, icon="FORCE_WIND")
                 
                 #---------------------------------------------------------------------------------------------
-                    box1 = col1.box()
+                    box1 = col.box()
                     sgRow = box1.row(align = True)
                     sgRow.scale_y = 1.4
                     collCntr = bpy.data.node_groups[bgenModName].nodes["ID:bgen_CC_001"].inputs[1]
@@ -2006,11 +2016,14 @@ class BGEN_ui_panel(bpy.types.Panel):
                 #---------------------------------------------------------------------------------------------
 
                 if obj_exp.menu_exp7 == True:
-                    box1 = col1.box()
-                    row1 = box1.row()
+                    box1 = col.box()
+                    cols = box1.column()
+                    cols.scale_y = 1.2
+                    row1 = cols.row()
                     row1.prop(obj_exp, "menu_exp7",icon="TRIA_DOWN", text="HAIR SIM", emboss=False)
                     row1.label(text = "", icon = "OUTLINER_OB_POINTCLOUD")
-                    col_ = col1.column()
+
+                    col_ = cols.column()
                     col_.scale_y = 1.4
                     vbox = col_.box()
                     vcol = vbox.column()
@@ -2050,8 +2063,8 @@ class BGEN_ui_panel(bpy.types.Panel):
                         pass
                     
                     #[Weight Paint Float Curve]
-                    col_ = col1.column()
-                    fcc = col1.box()
+                    col_ = cols.column()
+                    fcc = cols.box()
                     fcc.scale_y = 1.2
                     fcr = fcc.row()
 
@@ -2067,7 +2080,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                     
                     #swCntr.draw(context, col_, swNode, text = 'Weight Paint')
 
-                    boxSv = col1.box()
+                    boxSv = cols.box()
                     colSv = boxSv.column(align = False)
                     colSv.scale_y = 1.2
                     rowSv = colSv.row()
@@ -2095,35 +2108,80 @@ class BGEN_ui_panel(bpy.types.Panel):
                         grid_r.prop(my_tools, "my_float1", text = "")
                         grid_r.prop(my_tools, "my_float2", text = "")
                         grid_r.prop(my_tools, "my_float3", text = "")
+
+                        if obj_exp.menu_exp8:
+                            colSv.prop(obj_exp, "menu_exp8",icon="TRIA_DOWN", text="Bake to Cache Settings", emboss=False)
+                            row_ = colSv.row(align = False)
+
+                            grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+                            grid_l.alignment = "RIGHT"
+                            grid_l.scale_x = 1.3
+                            grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+
+                            grid_l.label(text = "Simulation Start")
+                            grid_l.label(text = "               End")
+
+                            grid_r.prop(my_tools, "sim_start", text = "")
+                            grid_r.prop(my_tools, "sim_end", text = "")
+
+                            col_cache = colSv.column()
+                            col_cache.alignment = "RIGHT"
+                            if bpy.context.scene.bgen_tools.hair_collection != "":
+                                sim_obj_data = bpy.data.collections[bpy.context.scene.bgen_tools.hair_collection].objects[0]
+                                for mod in sim_obj_data.modifiers:
+                                    if mod.type == "CLOTH":
+                                        cache_data = sim_obj_data.modifiers["Cloth"].point_cache
+                                        col_cache.label(text = cache_data.info)
+                            else:
+                                pass
+
+                        else:
+                            colSv.prop(obj_exp, "menu_exp8",icon="TRIA_RIGHT", text="Bake to Cache Settings", emboss=False)
                         
-                        colSv = boxSv.column()
-                        rowSv = colSv.row(align = False)
                         
-                        colsm = colSv.column()
-                        rowsm = colsm.row()
-                        colsm.scale_y = 1.8
-                        rowsm.scale_y = .8
-                        rowsm.prop(my_tools, "simToggle_", expand = True)
-                        colsm.operator('object.bgen_execute_cloth_settings')
-                        
-                        
-                        #rowSv.prop(mytool, "simToggle", text = "")
-                        
-                                
-                        colSv = boxSv.column(align = False)
-                        #colSv.separator()
-                        boxCache = colSv.box()
-                        col1 = boxCache.column()
-                        
-                        #col1.label(text = 'Simulation Cache')
-                        row1 = col1.row(align = False)
-                        row1.scale_y = 1.2
-                        row1.operator("ptcache.bake_all")
-                        row1.operator("ptcache.free_bake_all")
+
                     else:
-                        rowSv.prop(obj_exp, "dd_exp8",icon="TRIA_RIGHT", text="Sim Values", emboss=False) 
+                        rowSv.prop(obj_exp, "dd_exp8",icon="TRIA_RIGHT", text="Sim Values", emboss=False)
+                    
+                    colSv = boxSv.column()
+                    rowSv = colSv.row(align = False)
+                    
+                    colsm = colSv.column(align=False)
+                    rowsm = colsm.row()
+                    colsm.scale_y = 1.8
+                    rowsm.scale_y = .6
+                    rowsm.prop(my_tools, "simToggle_", expand = True)
+                    colsm.operator('object.bgen_execute_cloth_settings')
+                    
+                    boxSv = cols.box()
+                    colSv = boxSv.column(align = False)
+                    colSv.scale_y = 1.2
+
+                    scene = bpy.context.scene
+                    frame_count = scene.frame_end - scene.frame_start + 1
+
+                    row_ = colSv.row()
+                    
+                    col_cache = colSv.column()
+                    col_cache.alignment = "RIGHT"
+                    if bpy.context.scene.bgen_tools.hair_collection != "":
+                        sim_obj_data = bpy.data.collections[bpy.context.scene.bgen_tools.hair_collection].objects[0]
+                        for mod in sim_obj_data.modifiers:
+                            if mod.type == "CLOTH":
+                                cache_data = sim_obj_data.modifiers["Cloth"].point_cache
+                                col_cache.label(text = "Current baking cache starts at [" + 
+                                                str(cache_data.frame_start) + "] and ends at frame [" + str(cache_data.frame_end)+"]")
+                                break
+                    else:
+                        pass
+
+                    rowSv = colSv.row()
+                    rowSv.scale_y = 1.2
+                    rowSv.operator("ptcache.bake_all")
+                    rowSv.operator("ptcache.free_bake_all")
+
                 else:
-                    box1 = col1.box()
+                    box1 = col.box()
                     row1 = box1.row()
                     row1.prop(obj_exp, "menu_exp7",icon="TRIA_RIGHT", text="HAIR SIM", emboss=False)
                     row1.label(text = "", icon = "OUTLINER_DATA_POINTCLOUD")
