@@ -263,7 +263,8 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
     
     def invoke(self, context, event):
         dirpath = os.path.dirname(os.path.realpath(__file__))
-        nodelib_path = os.path.join(dirpath, "bgen_v1_nodes.blend")
+        resource_folder = os.path.join(dirpath,"resources")
+        nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
         def load_node(nt_name, link=True):
             if not os.path.isfile(nodelib_path):
@@ -681,7 +682,8 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
 
     def invoke(self, context, event):
         dirpath = os.path.dirname(os.path.realpath(__file__))
-        nodelib_path = os.path.join(dirpath, "bgen_v1_nodes.blend")
+        resource_folder = os.path.join(dirpath,"resources")
+        nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
         def load_node(nt_name, link=True):
             if not os.path.isfile(nodelib_path):
