@@ -1201,7 +1201,7 @@ class BGEN_PT_bgenProperties(bpy.types.PropertyGroup):
     my_string1 : bpy.props.StringProperty(name= "")
     my_string2 : bpy.props.StringProperty(name= "")
     
-    my_int1 : bpy.props.IntProperty(name= "", soft_min= 0, soft_max= 20, default= (1))
+    my_int1 : bpy.props.IntProperty(name= "", soft_min= 0, soft_max= 20, default= (5))
 
     pinned_obj: bpy.props.PointerProperty(name="Pinned Object", type=bpy.types.Object,)
 
