@@ -1,7 +1,7 @@
 bl_info = {
     "name": "BGEN Flow",
     "author": "Munorr",
-    "version": (1, 1, 1),
+    "version": (1, 1, 3),
     "blender": (3, 5, 0),
     "location": "View3D > N",
     "description": "Control parameters from B_GEN geometry node hair system",
@@ -1404,7 +1404,7 @@ class BGEN_ui_panel(bpy.types.Panel):
             row_s.alignment = "LEFT"
             row_s.label(text = "[" + obj.type + "]", icon = "OBJECT_DATAMODE")
             row_s.label(text = "",icon = "TRIA_RIGHT")
-            row_s.label(text = obj.name, icon = "CURVES")
+            row_s.label(text = obj.name, icon = "OUTLINER_OB_CURVES")
             row_s.label(text = "",icon = "TRIA_RIGHT")
             
             obj_t = obj.evaluated_get(context.evaluated_depsgraph_get())
@@ -1492,11 +1492,11 @@ class BGEN_ui_panel(bpy.types.Panel):
 
                         rowt = col_.row(align = False)
                         if bgenMod["Input_69"] == True:
-                            rowt.prop(bgenMod, '["Input_69"]', text = 'Mesh',invert_checkbox=True,icon="CURVES")
-                            rowt.prop(bgenMod, '["Input_69"]', text = 'Curve',icon="CURVES")
+                            rowt.prop(bgenMod, '["Input_69"]', text = 'Mesh',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                            rowt.prop(bgenMod, '["Input_69"]', text = 'Curve',icon = "OUTLINER_OB_CURVES")
                         else:
-                            rowt.prop(bgenMod, '["Input_69"]', text = 'Mesh',invert_checkbox=True,icon="CURVES")
-                            rowt.prop(bgenMod, '["Input_69"]', text = 'Curve',icon="CURVES")
+                            rowt.prop(bgenMod, '["Input_69"]', text = 'Mesh',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                            rowt.prop(bgenMod, '["Input_69"]', text = 'Curve',icon = "OUTLINER_OB_CURVES")
 
                         col_.prop(bgenMod, '["Input_30"]', text = 'Attach To')
                         col_.prop(bgenMod, '["Input_31"]', text = 'Attach Amount')
@@ -1622,7 +1622,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                 if obj_exp.menu_exp2 == True:
                     if get_gNode(obj)[2] == nodeID_1:
                         row1.prop(obj_exp, "menu_exp2",icon="TRIA_DOWN", text="STRAND CONTROL", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                         cols = col1.column(align=True)
 
                         box_ = cols.box()
@@ -1676,18 +1676,18 @@ class BGEN_ui_panel(bpy.types.Panel):
                             
                             rowt = grid_r.row(align = True)
                             if bgenMod["Input_55"] == True:
-                                rowt.prop(bgenMod, '["Input_55"]', text = 'Tube',invert_checkbox=True,icon="CURVES")
-                                rowt.prop(bgenMod, '["Input_55"]', text = 'Strip',icon="CURVES")
+                                rowt.prop(bgenMod, '["Input_55"]', text = 'Tube',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                                rowt.prop(bgenMod, '["Input_55"]', text = 'Strip',icon = "OUTLINER_OB_CURVES")
                             else:
-                                rowt.prop(bgenMod, '["Input_55"]', text = 'Tube',invert_checkbox=True,icon="CURVES")
-                                rowt.prop(bgenMod, '["Input_55"]', text = 'Strip',icon="CURVES")
+                                rowt.prop(bgenMod, '["Input_55"]', text = 'Tube',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                                rowt.prop(bgenMod, '["Input_55"]', text = 'Strip',icon = "OUTLINER_OB_CURVES")
 
                         else:
                             col_.prop(obj_exp, "expand_settings1",icon="TRIA_RIGHT", text="More settings", emboss=False)
                     
                     if get_gNode(obj)[2] == nodeID_2:
                         row1.prop(obj_exp, "menu_exp2",icon="TRIA_DOWN", text="STRAND CONTROL", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                         cols = col1.column(align=True)
 
                         box_ = cols.box()
@@ -1729,18 +1729,18 @@ class BGEN_ui_panel(bpy.types.Panel):
          
                             rowt = grid_r.row(align = True)
                             if bgenMod["Input_70"] == True:
-                                rowt.prop(bgenMod, '["Input_70"]', text = 'Tube',invert_checkbox=True,icon="CURVES")
-                                rowt.prop(bgenMod, '["Input_70"]', text = 'Strip',icon="CURVES")
+                                rowt.prop(bgenMod, '["Input_70"]', text = 'Tube',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                                rowt.prop(bgenMod, '["Input_70"]', text = 'Strip',icon = "OUTLINER_OB_CURVES")
                             else:
-                                rowt.prop(bgenMod, '["Input_70"]', text = 'Tube',invert_checkbox=True,icon="CURVES")
-                                rowt.prop(bgenMod, '["Input_70"]', text = 'Strip',icon="CURVES")
+                                rowt.prop(bgenMod, '["Input_70"]', text = 'Tube',invert_checkbox=True,icon = "OUTLINER_OB_CURVES")
+                                rowt.prop(bgenMod, '["Input_70"]', text = 'Strip',icon = "OUTLINER_OB_CURVES")
 
                         else:
                             col_.prop(obj_exp, "expand_settings1",icon="TRIA_RIGHT", text="More settings", emboss=False)
                 
                 else:
                     row1.prop(obj_exp, "menu_exp2",icon="TRIA_RIGHT", text="STRAND CONTROL", emboss=False)
-                    row1.label(text = "", icon = "CURVES")
+                    row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                 
                 #============================================================================================
                                                 #[BRAID or DISPLACEMENT CONTROL: BRAIDS]
@@ -1754,7 +1754,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                 if obj_exp.menu_exp3 == True:
                     if get_gNode(obj)[2] == nodeID_1:
                         row1.prop(obj_exp, "menu_exp3",icon="TRIA_DOWN", text="DISPLACEMENT", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                         box_ = col1.box()
                         col_ = box_.column(align = True)
                         #row_ = col_.row(align = False)
@@ -1797,7 +1797,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                         
                     if get_gNode(obj)[2] == nodeID_2:
                         row1.prop(obj_exp, "menu_exp3",icon="TRIA_DOWN", text="BRAID CONTROL", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                         box_ = col1.box()
                         col_ = box_.column()
                         row_ = box_.row(align = False)
@@ -1838,11 +1838,11 @@ class BGEN_ui_panel(bpy.types.Panel):
                 else:
                     if get_gNode(obj)[2] == nodeID_1:
                         row1.prop(obj_exp, "menu_exp3",icon="TRIA_RIGHT", text="DISPLACEMENT", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                     
                     if get_gNode(obj)[2] == nodeID_2:
                         row1.prop(obj_exp, "menu_exp3",icon="TRIA_RIGHT", text="BRAID CONTROL", emboss=False)
-                        row1.label(text = "", icon = "CURVES")
+                        row1.label(text = "", icon = "OUTLINER_OB_CURVES")
                     
                 #============================================================================================
                                                 #[CURL CONTROL: BRAIDS]
