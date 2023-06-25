@@ -1053,7 +1053,7 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
                 appended_node_tree = data_to.node_groups[0]
                 get_mod_03 = appended_node_tree
                 mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
-                mod_03.node_group = get_mod_01
+                mod_03.node_group = get_mod_03
             else:
                 get_mod_03 = bpy.data.node_groups.get(stc_mod_name_01)
                 mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
@@ -1209,9 +1209,24 @@ class BGEN_OT_reset_index_order(bpy.types.Operator):
         objs = context.selected_objects
         for obj in objs:
             bpy.context.view_layer.objects.active = obj
-            get_reset = bpy.data.node_groups.get("00_bgen: reset_strip")
-            reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
-            reset_mod.node_group = get_reset
+
+            if "00_bgen: reset_strip" not in bpy.data.node_groups:
+                ''' Gets VTS modifier from resouorce file''' 
+                dirpath = os.path.dirname(os.path.realpath(__file__))
+                resource_folder = os.path.join(dirpath,"resources")
+                nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
+
+                with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                    data_to.node_groups = ["00_bgen: reset_strip"]
+
+                appended_node_tree = data_to.node_groups[0]
+                get_reset = appended_node_tree
+                reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
+                reset_mod.node_group = get_reset
+            else:
+                get_reset = bpy.data.node_groups.get("00_bgen: reset_strip")
+                reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
+                reset_mod.node_group = get_reset
 
             reset_mod_index = obj.modifiers.find(reset_mod.name)
             obj.modifiers.move(reset_mod_index, 0)
