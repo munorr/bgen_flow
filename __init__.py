@@ -2197,7 +2197,12 @@ class BGEN_ui_panel(bpy.types.Panel):
                         collCntr = bpy.data.node_groups[bgenModName].nodes["ID:bgen_CC_001"].inputs[1]
                         collNode = bpy.data.node_groups[bgenModName].nodes["ID:bgen_CC_001"] 
                         
-                        sgCol.prop(bgenMod, '["Input_67"]', text = 'Use Sim Guides',icon = "OUTLINER_OB_CURVES",expand=True)
+                        if bgenNodeID == nodeID_1:
+                            sgCol.prop(bgenMod, '["Input_62"]', text = 'Use Sim Guides',icon = "OUTLINER_OB_CURVES",expand=True)
+                        
+                        if bgenNodeID == nodeID_2:
+                            sgCol.prop(bgenMod, '["Input_67"]', text = 'Use Sim Guides',icon = "OUTLINER_OB_CURVES",expand=True)
+
                         collCntr.draw(context, sgCol, collNode, text = '')
                     #----------------------------------------------------------------------------------------------------------------
 
