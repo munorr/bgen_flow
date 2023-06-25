@@ -1009,7 +1009,7 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
             ''' Gets VTS modifier from resouorce file''' 
             dirpath = os.path.dirname(os.path.realpath(__file__))
             resource_folder = os.path.join(dirpath,"resources")
-            nodelib_path = os.path.join(resource_folder, "bgen_v2_nodes.blend")
+            nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
             with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
                 data_to.node_groups = [vts_mod_name_01]
@@ -1042,7 +1042,7 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
                 ''' Gets VTS modifier from resouorce file''' 
                 dirpath = os.path.dirname(os.path.realpath(__file__))
                 resource_folder = os.path.join(dirpath,"resources")
-                nodelib_path = os.path.join(resource_folder, "bgen_v2_nodes.blend")
+                nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
                 with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
                     data_to.node_groups = [stc_mod_name_01]
