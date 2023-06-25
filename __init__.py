@@ -2163,12 +2163,12 @@ class BGEN_ui_panel(bpy.types.Panel):
                     boxsg_l = rowsg.box()
                     cols = boxsg_l.column(align = True)
                     cols.scale_y = 1.4
-                    cols.operator("object.bv2_create_sim_guides", text="Create Sim Guides", icon = "FORCE_WIND", depress = True)
+                    cols.operator("object.bgen_create_sim_guides", text="Create Sim Guides", icon = "FORCE_WIND", depress = True)
                     
                     scrow = cols.row(align = True)
                     scrow.scale_x = 1.2
                     scrow.prop(bgen_tools, "sim_collection", text = "", icon = "COLLECTION_COLOR_05")
-                    scrow.operator("object.bv2_remove_sim_collection", text="", icon = "CANCEL")
+                    scrow.operator("object.bgen_remove_sim_collection", text="", icon = "CANCEL")
                     #------------------------------------------------------------------------------------
                     boxsg_l = rowsg.box()
                     sgCol = boxsg_l.column(align = True)
