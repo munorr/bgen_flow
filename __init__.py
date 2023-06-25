@@ -981,6 +981,9 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
         if stc_mod_name_01 not in bpy.data.node_groups:
             load_node(stc_mod_name_01, link=False)
 
+        if "00_bgen: [Resample Curve]" not in bpy.data.node_groups:
+            load_node("00_bgen: [Resample Curve]", link=False)
+        
         return context.window_manager.invoke_props_dialog(self)
     
     try:
