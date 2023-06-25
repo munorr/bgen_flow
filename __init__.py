@@ -568,7 +568,7 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             bgenMod["Input_50"] = False #Mesh or Curve
                             bgenMod["Input_26"] = True # With Simulation
                             bgenMod["Input_47"] = True # Follow Tilt
-                            if bgenMod["Input_63"]:
+                            if bgenMod["Input_63"] != None:
                                 bgenMod["Input_63"] = False # Vts or mesh
 
                         else:
@@ -636,7 +636,7 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             bgenMod["Input_50"] = False #Mesh or Curve
                             bgenMod["Input_26"] = True # With Simulation
                             bgenMod["Input_47"] = True # Follow Tilt
-                            if bgenMod["Input_63"]:
+                            if bgenMod["Input_63"] != None:
                                 bgenMod["Input_63"] = False # Vts or mesh
 
                         else:
@@ -781,7 +781,7 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
 
                 bgenMod["Input_50"] = False #Mesh or Curve
                 bgenMod["Input_26"] = True # With Simulation
-                if bgenMod["Input_63"]:
+                if bgenMod["Input_63"] != None:
                     bgenMod["Input_63"] = True # Vts or mesh
         else:
             '''Uses existing one''' 
@@ -793,7 +793,7 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
 
                 bgenMod["Input_50"] = False #Mesh or Curve
                 bgenMod["Input_26"] = True # With Simulation
-                if bgenMod["Input_63"]:
+                if bgenMod["Input_63"] != None:
                     bgenMod["Input_63"] = True # Vts or mesh
 
         
