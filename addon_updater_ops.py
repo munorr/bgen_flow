@@ -362,7 +362,7 @@ class AddonUpdaterUpdateTarget(bpy.types.Operator):
         name="Clean install",
         description=("If enabled, completely clear the addon's folder before "
                      "installing new update, creating a fresh install"),
-        default=True,
+        default=False,
         options={'HIDDEN'}
     )
 
