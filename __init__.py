@@ -253,7 +253,7 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
             return False
         return context.mode == "OBJECT"
     
-    mod_name: bpy.props.StringProperty(name="Modifier Name", description="Name the new modifier",default="bgen_v1_")
+    mod_name: bpy.props.StringProperty(name="Modifier Name", description="Name the new modifier",default="bgen_flow_")
     mod_option: bpy.props.EnumProperty(
         items=(('EXISTING', "Use Existing", "Use existing bgen modifier"),
                ('NEW', "Create New", "Create with new hair modifier")),
@@ -693,7 +693,7 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
             return False
         return context.mode == "OBJECT"
     
-    mod_name: bpy.props.StringProperty(name="Modifier Name", description="Name the new modifier",default="bgen_v1_")
+    mod_name: bpy.props.StringProperty(name="Modifier Name", description="Name the new modifier",default="bgen_flow_")
     mod_option: bpy.props.EnumProperty(
         items=(('EXISTING', "Use Existing", "Use existing bgen modifier"),
                ('NEW', "Create New", "Create with new hair modifier")),
