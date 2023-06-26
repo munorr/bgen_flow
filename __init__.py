@@ -1577,6 +1577,8 @@ class BGEN_PT_bgenExpandProp(bpy.types.PropertyGroup):
     exp_sim3 : bpy.props.BoolProperty(default=False) # Sim Values
     exp_sim4 : bpy.props.BoolProperty(default=False) # Collision Settings
     exp_sim5 : bpy.props.BoolProperty(default=False) # Cache settings
+    exp_sim6 : bpy.props.BoolProperty(default=False) # Object Collision
+    exp_sim7 : bpy.props.BoolProperty(default=False) # Self Collision
 
 #==================================================================================================
 #                                        [ADDON DISPLAY]
@@ -2564,12 +2566,14 @@ class BGEN_ui_panel(bpy.types.Panel):
                                 grid_l.label(text = "         Mass")
                                 grid_l.label(text = "      Gravity")
                                 grid_l.label(text = "      Tension")
+                                grid_l.label(text = "    Stiffness")
 
                                 grid_r.prop(sim_obj_data.settings, "quality", text = "")
                                 grid_r.prop(sim_obj_data.settings, "air_damping", text = "")
                                 grid_r.prop(sim_obj_data.settings, "mass", text = "")
                                 grid_r.prop(sim_obj_data.settings.effector_weights, "gravity", text = "")
                                 grid_r.prop(sim_obj_data.settings, "tension_stiffness", text = "")
+                                grid_r.prop(sim_obj_data.settings, "pin_stiffness", text = "")
                             else:
                                 rowss.prop(obj_exp, "exp_sim3",icon="RIGHTARROW", text="Sim Values", emboss=False)
 
@@ -2579,18 +2583,64 @@ class BGEN_ui_panel(bpy.types.Panel):
                             rowss = colss.row(align = True)
                             rowss.scale_x = 1.2
                             rowss.alignment = "LEFT"
-                            if obj_exp.exp_sim4: #Collision Settings
+                            if obj_exp.exp_sim4: # Collision Settings
                                 rowss.prop(obj_exp, "exp_sim4",icon="DOWNARROW_HLT", text="Collision Settings", emboss=False)
-                                row_ = colss.row(align = False)
+                                
+                                box_col = colss.box()
+                                col_col = box_col.column()
+                                rowss_ = col_col.row()
+                                if obj_exp.exp_sim6:
+                                    rowss_.prop(obj_exp, "exp_sim6",icon="DOWNARROW_HLT", text="", emboss=False)
+                                    rowss_.prop(sim_obj_data.collision_settings, "use_collision", text = "Object Collision")
 
-                                grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
-                                grid_l.alignment = "RIGHT"
-                                grid_l.scale_x = 1.6
-                                grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+                                    row_ = col_col.row(align = False)
+                                    grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+                                    grid_l.alignment = "RIGHT"
+                                    grid_l.scale_x = 1.6
+                                    grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
 
-                                grid_l.label(text = "Collision Collection")
+                                    grid_l.label(text = "    Collision Collection")
+                                    grid_l.label(text = "       Collision Quality")
+                                    grid_l.label(text = "                  Distance")
+                                    grid_l.label(text = "      Impulse Clamping")
 
-                                grid_r.prop(sim_obj_data.collision_settings, "collection", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "collection", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "collision_quality", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "distance_min", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "impulse_clamp", text = "")
+                                
+                                else:
+                                    rowss_.prop(obj_exp, "exp_sim6",icon="RIGHTARROW", text="", emboss=False)
+                                    rowss_.prop(sim_obj_data.collision_settings, "use_collision", text = "Object Collision")
+
+                                #-------------------------------------------------------------------------------------------------------
+                                box_col = colss.box()
+                                col_col = box_col.column()
+                                rowss_ = col_col.row()
+
+                                rowss_ = col_col.row()
+                                if obj_exp.exp_sim7:
+                                    rowss_.prop(obj_exp, "exp_sim7",icon="DOWNARROW_HLT", text="", emboss=False)
+                                    rowss_.prop(sim_obj_data.collision_settings, "use_self_collision", text = "Self Collision")
+
+                                    row_ = col_col.row(align = False)
+                                    grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+                                    grid_l.alignment = "RIGHT"
+                                    grid_l.scale_x = 1.6
+                                    grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+
+                                    grid_l.label(text = "  Self Collision Friction")
+                                    grid_l.label(text = "Self Collision Distance")
+                                    grid_l.label(text = "      Impulse Clamping")
+
+                                    grid_r.prop(sim_obj_data.collision_settings, "self_friction", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "self_distance_min", text = "")
+                                    grid_r.prop(sim_obj_data.collision_settings, "self_impulse_clamp", text = "")
+                                
+                                else:
+                                    rowss_.prop(obj_exp, "exp_sim7",icon="RIGHTARROW", text="", emboss=False)
+                                    rowss_.prop(sim_obj_data.collision_settings, "use_self_collision", text = "Self Collision")
+
                             else:
                                 rowss.prop(obj_exp, "exp_sim4",icon="RIGHTARROW", text="Collision Settings", emboss=False)
 
