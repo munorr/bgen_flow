@@ -491,11 +491,21 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             bgenMod["Input_69"] = False #Mesh or Curve
                             bgenMod["Input_71"] = True # With Simulation
                         else:
-                            get_mod_03 = bpy.data.node_groups.get(bgen_flow_mod_02)
+                            ''' Gets the geoNode hair modifier''' 
+                            dirpath = os.path.dirname(os.path.realpath(__file__))
+                            resource_folder = os.path.join(dirpath,"resources")
+                            nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
+
+                            with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                                data_to.node_groups = [bgen_flow_mod_02]
+
+                            appended_node_tree = data_to.node_groups[0]
+
+                            get_mod_03 = appended_node_tree
                             mod_03 = obj.modifiers.new(name="bgen_hair_modifier", type='NODES')
                             mod_03.node_group = get_mod_03
-                            mod_03.node_group = mod_03.node_group.copy()
                             mod_03.node_group.name = self.mod_name
+
                             bgenMod = get_gNode(obj)[0]
 
                             bgenMod["Input_69"] = False #Mesh or Curve
@@ -644,11 +654,21 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             bgenMod["Input_26"] = False # With Simulation
                             bgenMod["Input_47"] = True # Follow Tilt
                     else:
-                        get_mod_03 = bpy.data.node_groups.get(bgen_flow_mod_01)
+                        ''' Gets the geoNode hair modifier''' 
+                        dirpath = os.path.dirname(os.path.realpath(__file__))
+                        resource_folder = os.path.join(dirpath,"resources")
+                        nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
+
+                        with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                            data_to.node_groups = [bgen_flow_mod_01]
+
+                        appended_node_tree = data_to.node_groups[0]
+
+                        get_mod_03 = appended_node_tree
                         mod_03 = obj.modifiers.new(name="bgen_hair_modifier", type='NODES')
                         mod_03.node_group = get_mod_03
-                        mod_03.node_group = mod_03.node_group.copy()
                         mod_03.node_group.name = self.mod_name
+                        
                         bgenMod = get_gNode(obj)[0]
 
                         bgenMod["Input_50"] = True
