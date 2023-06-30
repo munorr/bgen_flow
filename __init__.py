@@ -1,7 +1,7 @@
 bl_info = {
     "name": "BGEN Flow",
     "author": "Munorr",
-    "version": (1, 2, 5),
+    "version": (1, 3, 0),
     "blender": (3, 5, 0),
     "location": "View3D > N",
     "description": "Control parameters from B_GEN geometry node hair system",
