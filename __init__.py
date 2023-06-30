@@ -1,7 +1,7 @@
 bl_info = {
     "name": "BGEN Flow",
     "author": "Munorr",
-    "version": (1, 2, 4),
+    "version": (1, 2, 5),
     "blender": (3, 5, 0),
     "location": "View3D > N",
     "description": "Control parameters from B_GEN geometry node hair system",
@@ -167,21 +167,17 @@ class BGEN_OT_choose_nodeTree(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     @classmethod
-    def poll(cls, context):
-        active = context.active_object
-        if active is None:
-            return False
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-                
+    def poll(cls, context):    
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
         ntID = get_gNode(obj)[2]
@@ -200,16 +196,18 @@ class BGEN_OT_choose_nodeTree(bpy.types.Operator):
         description="Select bgen braid modifier",)
     
     def execute(self, context):
-        if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
+        bgen_tools = context.scene.bgen_tools
+        if context.object is not None:
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
-        #obj = bpy.context.active_object
         node_group_name = get_gNode(obj)[0].name
         
         if get_gNode(obj)[2] == nodeID_1:
@@ -228,21 +226,16 @@ class BGEN_OT_single_user(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-
-        active = context.active_object
-        if active is None:
-            return False
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-        
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
         ntID = get_gNode(obj)[2]
@@ -251,16 +244,18 @@ class BGEN_OT_single_user(bpy.types.Operator):
         return context.mode == "OBJECT", context.mode == "SCULPT_CURVES"
     
     def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
-        #obj = bpy.context.active_object
         node_group_name = get_gNode(obj)[0].name
         
         obj.modifiers[node_group_name].node_group = obj.modifiers[node_group_name].node_group.copy()
@@ -276,28 +271,29 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
 
-        active = context.active_object
-        if active is None:
-            return False
-        if active.type == "MESH":
-            if len(active.data.polygons) !=0:
-                return False
-            
-        if active.type != "CURVES" and active.type != "CURVE" and active.type != "MESH":
-            return False
-        
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
+        if obj.type == "MESH":
+            if len(obj.data.polygons) !=0:
+                return False
+            
+        if obj.type != "CURVES" and obj.type != "CURVE" and obj.type != "MESH":
+            return False
+        
+        selected_objects = context.selected_objects
+        if selected_objects is None:
+            return False
+        
         ntID = get_gNode(obj)[2]
         if ntID == nodeID_1  or ntID == nodeID_2:
             return False
@@ -533,7 +529,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             mod_02.settings.vertex_group_mass = "Group"  # Sets Pin group
                             mod_02.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
                             mod_02.collision_settings.distance_min = 0.001
-                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection]
+                            mod_02.collision_settings.self_distance_min = 0.001
+                            mod_02.settings.effector_weights.all = 100
+                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection] if self.collision_collection != "" else 0 
 
                             ''' Gets the geoNode hair modifier''' 
                             dirpath = os.path.dirname(os.path.realpath(__file__))
@@ -613,7 +611,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             mod_02.settings.vertex_group_mass = "Group"  # Sets Pin group
                             mod_02.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
                             mod_02.collision_settings.distance_min = 0.001
-                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection]
+                            mod_02.collision_settings.self_distance_min = 0.001
+                            mod_02.settings.effector_weights.all = 100
+                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection] if self.collision_collection != "" else 0 
 
                             mod_03 = obj.modifiers.new(name="bgen_braid_modifier", type='NODES')
                             mod_03.node_group = bpy.data.node_groups[self.braid_nodes]
@@ -665,7 +665,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             mod_02.settings.vertex_group_mass = "Group"  # Sets Pin group
                             mod_02.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
                             mod_02.collision_settings.distance_min = 0.001
-                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection]
+                            mod_02.collision_settings.self_distance_min = 0.001
+                            mod_02.settings.effector_weights.all = 100
+                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection] if self.collision_collection != "" else 0 
 
                             ''' Gets the geoNode hair modifier''' 
                             dirpath = os.path.dirname(os.path.realpath(__file__))
@@ -734,6 +736,8 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                         else:
                             bgenMod["Input_61"] = True # With Simulation
 
+                    bgenMod = get_gNode(obj)[0]
+                    bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
             else:
                 '''Uses existing one''' 
                 for obj in objs:
@@ -757,7 +761,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             mod_02.settings.vertex_group_mass = "Group"  # Sets Pin group
                             mod_02.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
                             mod_02.collision_settings.distance_min = 0.001
-                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection]
+                            mod_02.collision_settings.self_distance_min = 0.001
+                            mod_02.settings.effector_weights.all = 100
+                            mod_02.collision_settings.collection = bpy.data.collections[self.collision_collection] if self.collision_collection != "" else 0
 
                             mod_03 = obj.modifiers.new(name="bgen_hair_modifier", type='NODES')
                             mod_03.node_group = bpy.data.node_groups[self.hair_nodes]
@@ -790,7 +796,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                             bgenMod["Input_61"] = False # With Simulation
                         else:
                             bgenMod["Input_61"] = True # With Simulation
-            
+
+                    bgenMod = get_gNode(obj)[0]
+                    bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
 
 
         return{'FINISHED'}
@@ -804,29 +812,29 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
 
-        active = context.active_object
-        if active is None:
-            return False
-        if active.type == "MESH":
-            if len(active.data.polygons) ==0:
+        bgen_tools = context.scene.bgen_tools
+        if context.active_object is not None:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
+                obj = context.active_object
+        else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
+                obj = context.active_object
+
+        if obj.type == "MESH":
+            if len(obj.data.polygons) ==0:
                 return False
             
-        if active.type != "MESH":
+        if obj.type != "MESH":
             return False
 
         selected_objects = context.selected_objects
         if selected_objects is None:
             return False
         
-        if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
-            if bgen_tools.pin_obj == True:
-                obj = bpy.context.scene.bgen_tools.pinned_obj
-            else:
-                obj = context.active_object
-        else:
-                obj = context.active_object
-
         ntID = get_gNode(obj)[2]
         if ntID == nodeID_1  or ntID == nodeID_2:
             return False
@@ -890,8 +898,7 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
             load_material(bgen_hair_shader, link=False)
         
         return context.window_manager.invoke_props_dialog(self)
-    
-    
+      
     def draw(self, context):
         obj = context.active_object
         layout = self.layout
@@ -910,12 +917,10 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
             col_.prop(self,"hair_nodes", text="")
         else:
             col_.prop(self,"mod_name", text="Mod Name")
-
         
     def execute(self, context):
         objs = bpy.context.selected_objects
-
-        
+   
         if self.mod_option == "NEW":
             ''' Gets the geoNode hair modifier''' 
             for obj in objs:
@@ -941,11 +946,14 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
                 mod_01.node_group.name = self.mod_name'''
 
                 bgenMod = get_gNode(obj)[0]
+                bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
 
                 bgenMod["Input_50"] = False #Mesh or Curve
                 bgenMod["Input_26"] = True # With Simulation
                 if bgenMod["Input_63"] != None:
                     bgenMod["Input_63"] = True # Vts or mesh
+
+                
         else:
             '''Uses existing one''' 
             for obj in objs:
@@ -953,15 +961,12 @@ class BGEN_OT_add_LM_mod(bpy.types.Operator):
                 mod_01.node_group = bpy.data.node_groups[self.hair_nodes]
 
                 bgenMod = get_gNode(obj)[0]
+                bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
 
                 bgenMod["Input_50"] = False #Mesh or Curve
                 bgenMod["Input_26"] = True # With Simulation
                 if bgenMod["Input_63"] != None:
                     bgenMod["Input_63"] = True # Vts or mesh
-
-        
-       
-
 
         return{'FINISHED'}
     
@@ -973,29 +978,28 @@ class BGEN_OT_remove_bgen_mod(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        active = context.active_object
-        if active is None:
-            return False
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-        
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
+        selected_objects = context.selected_objects
+        if selected_objects is None:
+            return False
+        
         ntID = get_gNode(obj)[2]
         if ntID != nodeID_1  and ntID != nodeID_2:
             return False
         return context.mode == "OBJECT"
     
     def execute(self, context):
-        
         objs = context.selected_objects
         for obj in objs:
             if obj.modifiers:
@@ -1114,25 +1118,23 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-
-        active = context.active_object
-        if active is None:
-            return False
-        
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-        
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
-        if not obj.type == "CURVES":
+        selected_objects = context.selected_objects
+        if selected_objects is None:
+            return False
+        
+        if obj.type != "CURVES":
             return False
         
         ntID = get_gNode(obj)[2]
@@ -1183,137 +1185,138 @@ class BGEN_OT_create_sim_guides(bpy.types.Operator):
         
         return context.window_manager.invoke_props_dialog(self)
     
-    try:
-        collision_collection: bpy.props.EnumProperty(
-            items=lambda self, context: [(c.name, c.name, "") for c in context.scene.collection.children],
-            name="Collision Collection")
+
+    collision_collection: bpy.props.EnumProperty(
+        items=lambda self, context: [(c.name, c.name, "") for c in context.scene.collection.children],
+        name="Collision Collection")
+    
+    resolution : bpy.props.IntProperty(name= "Resolution", soft_min= 0, soft_max= 50, default= (16))
+    
+    def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
+        if context.active_object is not None:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
+                obj = context.active_object
+        else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
+                obj = context.active_object
+
+        obj_ = obj
+        obj_.hide_select = False
+        main_obj = obj_.name
+
+        bpy.ops.object.select_all(action='DESELECT')
         
-        resolution : bpy.props.IntProperty(name= "Resolution", soft_min= 0, soft_max= 50, default= (16))
+        obj_.select_set(True)
+        bpy.context.view_layer.objects.active = obj_
+        obj = bpy.context.active_object
         
-        def execute(self, context):
-            if context.active_object is not None:
-                bgen_tools = context.scene.bgen_tools
-                if bgen_tools.pin_obj == True:
-                    obj = bpy.context.scene.bgen_tools.pinned_obj
-                else:
-                    obj = context.active_object
-            else:
-                    obj = context.active_object
+        convert_to_mesh(obj,self.resolution)  # Used method to convert to mesh
+        obj = bpy.context.active_object
+        obj.name = "SIM=[" + obj_.name + "]"
+        obj_.hide_select = True
+        #--------------------------------------------------------------------------
+        if obj.name not in vts_nodes():
+            ''' Gets VTS modifier from resouorce file''' 
+            dirpath = os.path.dirname(os.path.realpath(__file__))
+            resource_folder = os.path.join(dirpath,"resources")
+            nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
-            obj_ = obj
-            obj_.hide_select = False
-            main_obj = obj_.name
+            with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                data_to.node_groups = [vts_mod_name_01]
 
-            bpy.ops.object.select_all(action='DESELECT')
-            
-            obj_.select_set(True)
-            bpy.context.view_layer.objects.active = obj_
-            obj = bpy.context.active_object
-            
-            convert_to_mesh(obj,self.resolution)  # Used method to convert to mesh
-            obj = bpy.context.active_object
-            obj.name = "SIM=[" + obj_.name + "]"
-            obj_.hide_select = True
-            #--------------------------------------------------------------------------
-            if obj.name not in vts_nodes():
-                ''' Gets VTS modifier from resouorce file''' 
-                dirpath = os.path.dirname(os.path.realpath(__file__))
-                resource_folder = os.path.join(dirpath,"resources")
-                nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
-
-                with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
-                    data_to.node_groups = [vts_mod_name_01]
-
-                appended_node_tree = data_to.node_groups[0]
-                get_mod_01 = appended_node_tree
-                mod_01 = obj.modifiers.new(name="VTS_node", type='NODES')
-                mod_01.node_group = get_mod_01
-                mod_01.node_group.name = obj.name
-            
-            else:
-                get_mod_01 = bpy.data.node_groups.get(obj.name)
-                mod_01 = obj.modifiers.new(name="VTS_node", type='NODES')
-                mod_01.node_group = get_mod_01
-            #--------------------------------------------------------------------------
-            mod_02 = obj.modifiers.new(name="Cloth", type='CLOTH')
-            # Remove all vertex groups from the object
-            for group in obj.vertex_groups:
-                obj.vertex_groups.remove(group)
-
-            # Add a new vertex group to the object
-            obj.vertex_groups.new(name="Group")
- 
-            cloth_modifier = obj.modifiers["Cloth"]    
-            cloth_modifier.settings.vertex_group_mass = "Group"  # Sets Pin group
-            cloth_modifier.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
-            cloth_modifier.collision_settings.distance_min = 0.001
-            if self.collision_collection == "":
-                pass
-            else:
-                cloth_modifier.collision_settings.collection = bpy.data.collections[self.collision_collection]
-
-            #-------------------------------------------------------------------------------
-            if stc_mod_name_01 not in bpy.data.node_groups:
-                ''' Gets VTS modifier from resouorce file''' 
-                dirpath = os.path.dirname(os.path.realpath(__file__))
-                resource_folder = os.path.join(dirpath,"resources")
-                nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
-
-                with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
-                    data_to.node_groups = [stc_mod_name_01]
-
-                appended_node_tree = data_to.node_groups[0]
-                get_mod_03 = appended_node_tree
-                mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
-                mod_03.node_group = get_mod_03
-            else:
-                get_mod_03 = bpy.data.node_groups.get(stc_mod_name_01)
-                mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
-                mod_03.node_group = get_mod_03
-
-            new_collection = bpy.data.collections.new("")
-            bpy.context.scene.collection.children.link(new_collection)
-            
-            # Add all selected objects to the new collection
-            selected_objects = bpy.context.selected_objects
-            for obj in selected_objects:
-                scene_collection = bpy.context.scene.collection
-                
-                if obj.users_collection:
-                    collection = obj.users_collection[0]
-                    collection.objects.unlink(obj)
-                
-                new_collection.objects.link(obj)
-            
-            bpy.context.view_layer.objects.active = obj_
-            new_collection.name = "SIM=[" + obj_.name + "]"
-            #------------------------------------------------------------------------------------
-            obj0 = obj_
-            bgenMod = get_gNode(obj0)[0]
-            nodeTree_name = get_gNode(obj0)[1]
-
-            bgenMod.node_group.nodes["ID:bgen_CC_001"].inputs[1].default_value = new_collection
-
-            if get_gNode(obj_)[2] == nodeID_1:
-                bgenMod["Input_62"] = True  
-            if get_gNode(obj_)[2] == nodeID_2:
-                bgenMod["Input_67"] = True 
-            
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.ops.object.mode_set(mode='OBJECT')
-            new_collection.hide_render = True
-            new_collection.hide_viewport = True
-            bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[new_collection.name].exclude = True
-            
-            obj_.hide_select = False
-            bpy.context.view_layer.objects.active = obj_
-            obj_.select_set(True)
-
-            bpy.context.scene.bgen_tools.vts_mod = mod_01.node_group.name
-            return {'FINISHED'}
-    except:
-        pass
+            appended_node_tree = data_to.node_groups[0]
+            get_mod_01 = appended_node_tree
+            mod_01 = obj.modifiers.new(name="VTS_node", type='NODES')
+            mod_01.node_group = get_mod_01
+            mod_01.node_group.name = obj.name
         
+        else:
+            get_mod_01 = bpy.data.node_groups.get(obj.name)
+            mod_01 = obj.modifiers.new(name="VTS_node", type='NODES')
+            mod_01.node_group = get_mod_01
+        #--------------------------------------------------------------------------
+        mod_02 = obj.modifiers.new(name="Cloth", type='CLOTH')
+        # Remove all vertex groups from the object
+        for group in obj.vertex_groups:
+            obj.vertex_groups.remove(group)
+
+        # Add a new vertex group to the object
+        obj.vertex_groups.new(name="Group")
+
+        cloth_modifier = obj.modifiers["Cloth"]    
+        cloth_modifier.settings.vertex_group_mass = "Group"  # Sets Pin group
+        cloth_modifier.collision_settings.vertex_group_object_collisions = "" # Sets Collision group
+        cloth_modifier.collision_settings.distance_min = 0.001
+        if self.collision_collection == "":
+            pass
+        else:
+            cloth_modifier.collision_settings.collection = bpy.data.collections[self.collision_collection]
+
+        #-------------------------------------------------------------------------------
+        if stc_mod_name_01 not in bpy.data.node_groups:
+            ''' Gets VTS modifier from resouorce file''' 
+            dirpath = os.path.dirname(os.path.realpath(__file__))
+            resource_folder = os.path.join(dirpath,"resources")
+            nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
+
+            with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                data_to.node_groups = [stc_mod_name_01]
+
+            appended_node_tree = data_to.node_groups[0]
+            get_mod_03 = appended_node_tree
+            mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
+            mod_03.node_group = get_mod_03
+        else:
+            get_mod_03 = bpy.data.node_groups.get(stc_mod_name_01)
+            mod_03 = obj.modifiers.new(name="STC_node", type='NODES')
+            mod_03.node_group = get_mod_03
+
+        new_collection = bpy.data.collections.new("")
+        bpy.context.scene.collection.children.link(new_collection)
+        
+        # Add all selected objects to the new collection
+        selected_objects = bpy.context.selected_objects
+        for obj in selected_objects:
+            scene_collection = bpy.context.scene.collection
+            
+            if obj.users_collection:
+                collection = obj.users_collection[0]
+                collection.objects.unlink(obj)
+            
+            new_collection.objects.link(obj)
+        
+        bpy.context.view_layer.objects.active = obj_
+        new_collection.name = "SIM=[" + obj_.name + "]"
+        #------------------------------------------------------------------------------------
+        obj0 = obj_
+        bgenMod = get_gNode(obj0)[0]
+        nodeTree_name = get_gNode(obj0)[1]
+
+        bgenMod.node_group.nodes["ID:bgen_CC_001"].inputs[1].default_value = new_collection
+
+        if get_gNode(obj_)[2] == nodeID_1:
+            bgenMod["Input_62"] = True  
+        if get_gNode(obj_)[2] == nodeID_2:
+            bgenMod["Input_67"] = True 
+        
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        new_collection.hide_render = True
+        new_collection.hide_viewport = True
+        bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[new_collection.name].exclude = True
+        
+        obj_.hide_select = False
+        bpy.context.view_layer.objects.active = obj_
+        obj_.select_set(True)
+
+        bpy.context.scene.bgen_tools.vts_mod = mod_01.node_group.name
+        return {'FINISHED'}
+
 class BGEN_OT_remove_sim_collection(bpy.types.Operator):
     """ Remove Sim Collection """
     bl_idname = "object.bgen_remove_sim_collection"
@@ -1322,22 +1325,22 @@ class BGEN_OT_remove_sim_collection(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        active = context.active_object
-        if active is None:
-            return False
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-        
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
+        selected_objects = context.selected_objects
+        if selected_objects is None:
+            return False
+        
         if not obj.type == "CURVES":
             return False
         
@@ -1347,15 +1350,18 @@ class BGEN_OT_remove_sim_collection(bpy.types.Operator):
         return context.mode == "OBJECT"
     
     def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
-            obj_exp = context.object.bgen_expand
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
+
         ob = obj
         if get_gNode(obj)[2] == nodeID_1 or get_gNode(obj)[2] == nodeID_2:
             collCntr = bpy.data.node_groups[get_gNode(obj)[1]].nodes["ID:bgen_CC_001"].inputs[1]
@@ -1396,14 +1402,16 @@ class BGEN_OT_flip_index_order(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        active = context.active_object
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
         if obj is None:
@@ -1411,8 +1419,9 @@ class BGEN_OT_flip_index_order(bpy.types.Operator):
         if not obj.type == "MESH":
             return False
         if obj.type == "MESH":
-            if len(active.data.polygons) !=0:
+            if len(obj.data.polygons) !=0:
                 return False
+            
         selected_objects = context.selected_objects
         if selected_objects is None:
             return False
@@ -1424,13 +1433,16 @@ class BGEN_OT_flip_index_order(bpy.types.Operator):
         return context.mode == "OBJECT" 
     
     def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
         
         bpy.ops.object.select_all(action='DESELECT')
@@ -1453,16 +1465,19 @@ class BGEN_OT_reset_index_order(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
 
-        active = context.active_object
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
+        
         if obj is None:
             return False
         if not obj.type == "MESH":
@@ -1474,58 +1489,62 @@ class BGEN_OT_reset_index_order(bpy.types.Operator):
         if selected_objects is None:
             return False
         
+        ntID = get_gNode(obj)[2]
+        if ntID != nodeID_1  and ntID != nodeID_2:
+            return False
+        
         return context.mode == "OBJECT" 
     
     def execute(self, context):
-        active = context.active_object
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
-            obj = context.active_object
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
+                obj = context.active_object
 
         objs = context.selected_objects
         for obj in objs:
-            if get_gNode(obj)[2] != nodeID_1 and get_gNode(obj)[2] != nodeID_2:
-                self.report({"ERROR"},message= obj.name + " does not have bgen flow mod")
-                pass
-            else:
-                bpy.context.view_layer.objects.active = obj
+            if obj.type == "MESH":
+                if len(obj.data.polygons) ==0:
+                    bpy.context.view_layer.objects.active = obj
 
-                if rstrip_mod_name_01 not in bpy.data.node_groups:
-                    ''' Gets VTS modifier from resouorce file''' 
-                    dirpath = os.path.dirname(os.path.realpath(__file__))
-                    resource_folder = os.path.join(dirpath,"resources")
-                    nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
+                    if rstrip_mod_name_01 not in bpy.data.node_groups:
+                        ''' Gets VTS modifier from resouorce file''' 
+                        dirpath = os.path.dirname(os.path.realpath(__file__))
+                        resource_folder = os.path.join(dirpath,"resources")
+                        nodelib_path = os.path.join(resource_folder, "bgen_v1_nodes.blend")
 
-                    with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
-                        data_to.node_groups = [rstrip_mod_name_01]
+                        with bpy.data.libraries.load(nodelib_path, link=False) as (data_from, data_to):
+                            data_to.node_groups = [rstrip_mod_name_01]
 
-                    appended_node_tree = data_to.node_groups[0]
-                    get_reset = appended_node_tree
-                    reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
-                    reset_mod.node_group = get_reset
-                else:
-                    get_reset = bpy.data.node_groups.get(rstrip_mod_name_01)
-                    reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
-                    reset_mod.node_group = get_reset
+                        appended_node_tree = data_to.node_groups[0]
+                        get_reset = appended_node_tree
+                        reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
+                        reset_mod.node_group = get_reset
+                    else:
+                        get_reset = bpy.data.node_groups.get(rstrip_mod_name_01)
+                        reset_mod = obj.modifiers.new(name="reset_modifier", type='NODES')
+                        reset_mod.node_group = get_reset
 
-                reset_mod_index = obj.modifiers.find(reset_mod.name)
-                obj.modifiers.move(reset_mod_index, 0)
-                bpy.ops.object.modifier_apply(modifier=reset_mod.name)
+                    reset_mod_index = obj.modifiers.find(reset_mod.name)
+                    obj.modifiers.move(reset_mod_index, 0)
+                    bpy.ops.object.modifier_apply(modifier=reset_mod.name)
 
-                # Remove all vertex groups from the object
-                for group in obj.vertex_groups:
-                    obj.vertex_groups.remove(group)
+                    # Remove all vertex groups from the object
+                    for group in obj.vertex_groups:
+                        obj.vertex_groups.remove(group)
 
-                # Add a new vertex group to the object
-                obj.vertex_groups.new(name="Group")
+                    # Add a new vertex group to the object
+                    obj.vertex_groups.new(name="Group")
 
-                bpy.ops.object.mode_set(mode='EDIT')
-                bpy.ops.object.mode_set(mode='OBJECT')
+                    bpy.ops.object.mode_set(mode='EDIT')
+                    bpy.ops.object.mode_set(mode='OBJECT')
 
         self.report({"INFO"},message="Index order Flipped")
         return{'FINISHED'}
@@ -1538,25 +1557,29 @@ class BGEN_OT_bake_hair_sim(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return context.mode == 'OBJECT'
-
     
     def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
-            obj_exp = context.object.bgen_expand
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
+        
+        if obj.type == "CURVES":
+            bgenMod = get_gNode(obj)[0]
+            mod_sim_data = bgenMod.node_group.nodes["ID:bgen_CC_001"].inputs[1].default_value.name
 
-        bgenMod = get_gNode(obj)[0]
-        mod_sim_data = bgenMod.node_group.nodes["ID:bgen_CC_001"].inputs[1].default_value.name
-
-        bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[mod_sim_data].exclude = False
-        bpy.ops.ptcache.bake_all(bake=True)
-        bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[mod_sim_data].exclude = True
+            bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[mod_sim_data].exclude = False
+            bpy.ops.ptcache.bake_all(bake=True)
+            bpy.data.scenes[bpy.context.scene.name].view_layers[bpy.context.view_layer.name].layer_collection.children[mod_sim_data].exclude = True
+        else:
+            bpy.ops.ptcache.bake_all(bake=True)
         self.report({"INFO"},message="SIM BAKE FINISHED")
         return {'FINISHED'}
 
@@ -1568,22 +1591,22 @@ class BGEN_OT_choose_vts_nodeTree(bpy.types.Operator):
     
     @classmethod
     def poll(cls, context):
-        active = context.active_object
-        if active is None:
-            return False
-        selected_objects = context.selected_objects
-        if selected_objects is None:
-            return False
-        
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
+        selected_objects = context.selected_objects
+        if selected_objects is None:
+            return False
+        
         ntID = get_gNode(obj)[2]
         if ntID != nodeID_1  or ntID != nodeID_2:
             return False
@@ -1596,14 +1619,16 @@ class BGEN_OT_choose_vts_nodeTree(bpy.types.Operator):
 
     
     def execute(self, context):
+        bgen_tools = context.scene.bgen_tools
         if context.active_object is not None:
-            bgen_tools = context.scene.bgen_tools
-            obj_exp = context.object.bgen_expand
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
 
         bgenMod = get_gNode(obj)[0]
@@ -1715,6 +1740,9 @@ class BGEN_PT_bgenExpandProp(bpy.types.PropertyGroup):
     dd_exp6 : bpy.props.BoolProperty(default=False)
     dd_exp7 : bpy.props.BoolProperty(default=False) # WEIGHT PAINT
     dd_exp8 : bpy.props.BoolProperty(default=False) # Sim Values
+    dd_exp9 : bpy.props.BoolProperty(default=False) # Noise FC
+    dd_exp10 : bpy.props.BoolProperty(default=False) # Fly Away 
+    dd_exp11 : bpy.props.BoolProperty(default=False) # Fly Away FC
 
     expand_settings1 : bpy.props.BoolProperty(default=False)
     expand_settings2 : bpy.props.BoolProperty(default=False)
@@ -1749,16 +1777,22 @@ class BGEN_ui_panel(bpy.types.Panel):
     def draw(self, context):
         addon_updater_ops.update_notice_box_ui(self,context)
 
+        bgen_tools = context.scene.bgen_tools
+        obj_exp = context.object.bgen_expand
         if context.active_object is not None:
             bgen_tools = context.scene.bgen_tools
-            obj_exp = context.object.bgen_expand
             if bgen_tools.pin_obj == True:
                 obj = bpy.context.scene.bgen_tools.pinned_obj
             else:
                 obj = context.active_object
         else:
+            bgen_tools = context.scene.bgen_tools
+            if bgen_tools.pin_obj == True:
+                obj = bpy.context.scene.bgen_tools.pinned_obj
+            else:
                 obj = context.active_object
-        
+
+                
         if obj is None:
             layout = self.layout                
             col = layout.column()
@@ -1794,10 +1828,14 @@ class BGEN_ui_panel(bpy.types.Panel):
             row_nt.label(text="[Not Applicable]")
 
             box = col.box()
-            col1 = box.column()
+            row1 = box.row()
+            col1 = row1.column()
             col1.scale_y = 1
             col1.alignment = "CENTER"
             col1.label(text = obj.name, icon = "OBJECT_DATAMODE")
+            row_pin = row1.row()
+            row_pin.alignment = "RIGHT"
+            row_pin.prop(bgen_tools, "pin_obj", text="", icon = "PINNED" if bgen_tools.pin_obj else "UNPINNED", icon_only = True, emboss=False)
 
             box1 = box.box()
             col1 = box1.column()
@@ -1981,7 +2019,8 @@ class BGEN_ui_panel(bpy.types.Panel):
                 cgrad = bpy.data.materials[mattName].node_tree.nodes['Cycles Gradient']
                 cbsdf = bpy.data.materials[mattName].node_tree.nodes['Cycles bsdf']
                 ccolvar = bpy.data.materials[mattName].node_tree.nodes['Cycles Variation']
-                
+
+                bgen_tools = context.scene.bgen_tools
                 #MATERIAL DRWAWER
                 if obj_exp.my_expT1: #MATERIAL DRAWER OPEN
                     row1.prop(obj_exp, "my_expT1",icon="TRIA_DOWN", text="MATERIAL", emboss=False)
@@ -1990,12 +2029,25 @@ class BGEN_ui_panel(bpy.types.Panel):
                     col_.scale_y = 1.2
                     mbox1 = col_.box()
                     mcol1 = mbox1.column(align = True)
+
+                    if matCntr.default_value is not None: 
+                        if mattName != matCntr.default_value.name:
+                            matCol = mcol1.column()
+                            matCol.alignment = "CENTER"
+                            matCol.label(text="Material control does not match with applied material.",icon="ERROR")
+                            matCol.separator()
+                    else:
+                        matCol = mcol1.column()
+                        matCol.alignment = "CENTER"
+                        matCol.label(text="Material not applied to hair.",icon="ERROR")
+                        matCol.separator()
+                                
                     mrow1 = mcol1.row(align = True)
                     mrow1.scale_x = 1.1
                     mrow1.scale_y = 1.2
                     
                     mrow_ = col_.row()
-                    bgen_tools = context.scene.bgen_tools
+                    
 
                     mrow1.prop(bgen_tools, "material_list", text = "", icon = "MATERIAL", icon_only = True)
                     mts_ = bpy.data.materials[bpy.context.scene.bgen_tools.material_list]
@@ -2234,11 +2286,16 @@ class BGEN_ui_panel(bpy.types.Panel):
                         grid_l.scale_x = 1.4
                         grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
                         
-                        grid_l.label(text = "Displacement X")
-                        grid_l.label(text = "                        Y")
-                        grid_l.label(text = "                        Z")
+                        grid_l.label(text = "                 Radius") if "Input_71" in bgenMod else 0
+                        grid_l.label(text = "Distribution Shape") if "Input_71" in bgenMod else 0
+                        grid_l.separator() if "Input_71" in bgenMod else 0 
+                        grid_l.label(text = "   Displacement X")
+                        grid_l.label(text = "                         Y")
+                        grid_l.label(text = "                         Z")
 
-                        
+                        grid_r.prop(bgenMod, '["Input_71"]', text = '') if "Input_71" in bgenMod else 0
+                        grid_r.prop(bgenMod, '["Input_72"]', text = '') if "Input_71" in bgenMod else 0
+                        grid_r.separator() if "Input_71" in bgenMod else 0 
                         grid_r.prop(bgenMod, '["Input_7"]', text = '')
                         grid_r.prop(bgenMod, '["Input_24"]', text = '')
                         grid_r.prop(bgenMod, '["Input_28"]', text = '')
@@ -2394,11 +2451,11 @@ class BGEN_ui_panel(bpy.types.Panel):
                         row1.prop(bgenMod, '["Input_68"]', text = '')
                 
                 #============================================================================================
-                                                #[ROOT / NOISE CONTROL: BRAIDS]
+                                                #[ROOT / NOISE CONTROL]
                 #============================================================================================
                 
                 box = col.box()
-                col1 = box.column()
+                col1 = box.column(align = True)
                 row1 = col1.row()
                 row1.scale_y = 1.4
                 
@@ -2406,11 +2463,10 @@ class BGEN_ui_panel(bpy.types.Panel):
                     if get_gNode(obj)[2] == nodeID_1:
                         row1.prop(obj_exp, "menu_exp5",icon="TRIA_DOWN", text="NOISE CONTROL", emboss=False)
                         row1.prop(bgenMod, '["Input_54"]', text = '')
-                        box_ = col1.box()
-                        col_ = box_.column()
+                        #box_ = col1.box()
+                        col_ = col1.box().column()
                         col_.scale_y = 1.2
                         row_ = col_.row(align = False)
-                        
                         grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
                         grid_l.alignment = "RIGHT"
                         grid_l.scale_x = 1.6
@@ -2418,17 +2474,62 @@ class BGEN_ui_panel(bpy.types.Panel):
                         
                         grid_l.label(text = "Noise Level")
                         grid_l.label(text = "Noise Radius")
-                        grid_l.separator()
-                        grid_l.label(text = "FA Amount")
-                        grid_l.label(text = "FA Displacement")
-                        grid_l.label(text = "FA Seed")
-                        
+
                         grid_r.prop(bgenMod, '["Input_9"]', text = '')
                         grid_r.prop(bgenMod, '["Input_29"]', text = '')
-                        grid_r.separator()
-                        grid_r.prop(bgenMod, '["Input_58"]', text = '')
-                        grid_r.prop(bgenMod, '["Input_59"]', text = '')
-                        grid_r.prop(bgenMod, '["Input_60"]', text = '')
+                        
+                        if "ID:bgen_noise_profile" in bgenMod.node_group.nodes: #Draw Noise Profile
+                            col_nfc = col1.box().column()
+                            row_nfc = col_nfc.row()
+                            if obj_exp.dd_exp9 == True:
+                                row_nfc.prop(obj_exp, "dd_exp9",icon="TRIA_DOWN", text="Noise Profile", emboss=False)
+                            
+                                
+                                noise_fc = bgenMod.node_group.nodes["ID:bgen_noise_profile"]
+                                noise_fc.draw_buttons_ext(context,col_nfc)
+                            else:
+                                row_nfc.prop(obj_exp, "dd_exp9",icon="TRIA_RIGHT", text="Noise Profile", emboss=False)
+
+                        col1.separator()
+                        col_fah = col1.box().column(align = True)
+                        row_fah = col_fah.row(align = True)
+                        row_fah.scale_y = 1.2
+                        if obj_exp.dd_exp10 == True:
+                            row_fah.prop(obj_exp, "dd_exp10",icon="TRIA_DOWN", text="Fly Away Hair", emboss=False)
+                            row_fah.prop(bgenMod, '["Input_75"]', text = '') if "Input_75" in bgenMod  else 0
+
+                            col_ = col_fah.box().column()
+                            col_.scale_y = 1.2
+                            row_ = col_.row(align = False)
+                            grid_l = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+                            grid_l.alignment = "RIGHT"
+                            grid_l.scale_x = 1.6
+                            grid_r = row_.grid_flow(row_major=False, columns=1, even_columns=False, even_rows=False, align=True)
+
+                            grid_l.label(text = "      FA Amount")
+                            grid_l.label(text = "FA Displacement")
+                            grid_l.label(text = "        FA Seed")
+                            grid_l.label(text = " FA Hair Length") if "Input_74" in bgenMod else 0
+
+                            grid_r.prop(bgenMod, '["Input_58"]', text = '')
+                            grid_r.prop(bgenMod, '["Input_59"]', text = '')
+                            grid_r.prop(bgenMod, '["Input_60"]', text = '')
+                            grid_r.prop(bgenMod, '["Input_74"]', text = '') if "Input_74" in bgenMod else 0
+
+                            if "ID:bgen_fly_away_profile" in bgenMod.node_group.nodes:
+                                col_fah_fc = col_fah.box().column()
+                                row_fah_fc = col_fah_fc.row()
+                                if obj_exp.dd_exp11 == True:
+                                    row_fah_fc.prop(obj_exp, "dd_exp11",icon="TRIA_DOWN", text="Fly away Profile", emboss=False)
+
+                                    fly_away_fc = bgenMod.node_group.nodes["ID:bgen_fly_away_profile"]
+                                    fly_away_fc.draw_buttons_ext(context,col_fah_fc)
+                                else:
+                                    row_fah_fc.prop(obj_exp, "dd_exp11",icon="TRIA_RIGHT", text="Fly Away Profile", emboss=False)
+
+                        else:
+                            row_fah.prop(obj_exp, "dd_exp10",icon="TRIA_RIGHT", text="Fly Away Hair", emboss=False)
+                            row_fah.prop(bgenMod, '["Input_75"]', text = '') if "Input_75" in bgenMod else 0
 
 
                     if get_gNode(obj)[2] == nodeID_2:
@@ -2717,6 +2818,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                                 grid_l.label(text = "      Gravity")
                                 grid_l.label(text = "      Tension")
                                 grid_l.label(text = "    Stiffness")
+                                grid_l.label(text = "Force Multiplier")
 
                                 grid_r.prop(sim_obj_data.settings, "quality", text = "")
                                 grid_r.prop(sim_obj_data.settings, "air_damping", text = "")
@@ -2724,6 +2826,7 @@ class BGEN_ui_panel(bpy.types.Panel):
                                 grid_r.prop(sim_obj_data.settings.effector_weights, "gravity", text = "")
                                 grid_r.prop(sim_obj_data.settings, "tension_stiffness", text = "")
                                 grid_r.prop(sim_obj_data.settings, "pin_stiffness", text = "")
+                                grid_r.prop(sim_obj_data.settings.effector_weights, "all", text = "")
                             else:
                                 rowss.prop(obj_exp, "exp_sim3",icon="RIGHTARROW", text="Sim Values", emboss=False)
 
