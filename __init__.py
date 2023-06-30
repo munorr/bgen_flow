@@ -2278,9 +2278,9 @@ class BGEN_ui_panel(bpy.types.Panel):
                         col_.scale_y = 1.4
                         
                         #row_.prop(bgenMod, '["Input_21"]', text = 'Flat Hair',icon="IPO_LINEAR")
-                        col_.prop(bgenMod, '["Input_47"]', text = 'Follow Tilt',icon="CON_FOLLOWPATH")
-                        if obj.modifiers[bgenMod.name]["Input_47"] == True:
-                            col_.prop(bgenMod, '["Input_46"]', text = 'Tilt Rotation',icon="CON_FOLLOWPATH")
+                        #col_.prop(bgenMod, '["Input_47"]', text = 'Follow Tilt',icon="CON_FOLLOWPATH")
+                        #if obj.modifiers[bgenMod.name]["Input_47"] == True:
+                        col_.prop(bgenMod, '["Input_46"]', text = 'Hair Rotation',icon="CON_FOLLOWPATH")
 
                         box_ = col1.box()
                         col_ = box_.column()
