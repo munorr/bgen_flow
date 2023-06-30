@@ -588,6 +588,9 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                         else:
                             bgenMod["Input_72"] = True # With Simulation
 
+                    bgenMod = get_gNode(obj)[0]
+                    bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
+
             else:
                 '''Uses existing one''' 
                 for obj in objs:
@@ -642,6 +645,8 @@ class BGEN_OT_add_VTS_mod(bpy.types.Operator):
                         else:
                             bgenMod["Input_72"] = True # With Simulation
                     
+                    bgenMod = get_gNode(obj)[0]
+                    bgenMod.node_group.nodes["ID:bv2_MC_001"].inputs[0].default_value = bpy.data.materials[bgen_hair_shader]
         else: #IF HAIR
             if self.mod_option == "NEW":
                 ''' Gets the geoNode hair modifier''' 
