@@ -156,8 +156,8 @@ class BGEN_OT_single_user_matt(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        mts_ = bpy.data.materials[bpy.context.scene.bgen_tools.matList].copy()
-        bpy.context.scene.bgen_tools.matList = mts_.name
+        mts_ = bpy.data.materials[bpy.context.scene.bgen_tools.material_list].copy()
+        bpy.context.scene.bgen_tools.material_list = mts_.name
         return{'FINISHED'}
     
 class BGEN_OT_choose_nodeTree(bpy.types.Operator):
